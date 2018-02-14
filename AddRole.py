@@ -20,6 +20,7 @@ if (args.checkrole == False and (args.role == None or args.email == None)):
 
 EMAIL = args.email
 ROLE = args.role
+HAS_ROLES = []
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -38,13 +39,25 @@ query = "SELECT * FROM users WHERE email= %s "
 cursor.execute(query, (EMAIL,))
 
 rows = cursor.fetchall()
+
 if (len(rows)) < 1:
 	print "User with email: " + EMAIL + " not found."
 	sys.exit()
 
+
+
 for stuff in rows:
-	print "User " + EMAIL + "\nID: " + str(stuff[0])
+	#print "User " + EMAIL + "\nID: " + str(stuff[0])
 	ID = stuff[0]
+
+
+# check what roles the user already has
+query = "SELECT * FROM roles WHERE userId= %s"
+cursor.execute(query, (ID,))
+rows = cursor.fetchall()
+for row in rows:
+	HAS_ROLES.append(row[4])
+
 
 if args.checkrole:
 	stmt = "SELECT * FROM roles WHERE userId = %s"
@@ -55,10 +68,13 @@ if args.checkrole:
 		print "ROLE: " + row[4]
 
 if args.addrole:
-	stmt = "INSERT INTO roles(userId, role) VALUES (%s, %s)"
-	cursor.execute(stmt, (ID, ROLE))
-	cnx.commit()
-	print "[+] OK"
+	if not ROLE in HAS_ROLES:
+		stmt = "INSERT INTO roles(userId, role) VALUES (%s, %s)"
+		cursor.execute(stmt, (ID, ROLE))
+		cnx.commit()
+		print "[+] OK"
+	else:
+		print "User: " + EMAIL + " already has the role: " + ROLE
 
 if args.remrole:
 	query = "DELETE FROM roles WHERE userId = %s AND role = %s"
