@@ -32,10 +32,14 @@ cnx = mysql.connector.connect(user=DBUSER, database=DBNAME, host=DBHOST, passwor
 cursor = cnx.cursor(prepared=True)
 
 query = "SELECT * FROM users WHERE email= %s " 
-
 cursor.execute(query, (EMAIL,))
 
-for stuff in cursor:
+rows = cursor.fetchall()
+if (len(rows)) < 1:
+	print "User with email: " + EMAIL + " not found."
+	sys.exit()
+
+for stuff in rows:
 	print "User " + EMAIL + "\nID: " + str(stuff[0])
 	ID = stuff[0]
 
