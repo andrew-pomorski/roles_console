@@ -7,6 +7,7 @@ Add / Remove roles to a user from command line
 * --email   - required, string, email of user you wish to change the role of
 * --addrole - ADDS the role to specified user
 * --remrole - REMOVES the role from a specified user
+* --checkrole - checks the roles of a specified user
 
 ## Setup
 
@@ -24,7 +25,7 @@ chmod +x AddRole.py
 ```
 
 
-## Example
+## Examples
 
 This will grant the role 'superadmin' to user with email address 'test@user.com'
 
@@ -36,4 +37,10 @@ This will remove the role 'superadmin' from user with email address 'test@user.c
 
 ```
 ./AddRole.py --email test@user.com --role superadmin --remrole True
+```
+
+This will check what roles user wth email test@user.com has 
+
+```
+./AddRole.py --email test@user.com --checkrole True
 ```

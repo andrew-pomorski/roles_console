@@ -8,11 +8,12 @@ import sys
 parser = argparse.ArgumentParser(description='Add or remove role for user.')
 parser.add_argument('--addrole', type=bool, help="Add role to specified user", default=False)
 parser.add_argument('--remrole', type=bool, help="Remove role from user", default=False)
+parser.add_argument('--checkrole', type=bool, help="Check what roles are assigned to given user", default=False)
 parser.add_argument('--role', type=str, help="Which role to assign")
 parser.add_argument('--email', type=str, help="Email address of an user")
 args = parser.parse_args()
 
-if (args.role == None or args.email == None):
+if (args.checkrole == False and (args.role == None or args.email == None)):
 	parser.print_help()
 	sys.exit()
 
@@ -31,6 +32,8 @@ DBPWD  = config['DBAUTH']['db_pwd']
 cnx = mysql.connector.connect(user=DBUSER, database=DBNAME, host=DBHOST, password=DBPWD)
 cursor = cnx.cursor(prepared=True)
 
+
+
 query = "SELECT * FROM users WHERE email= %s " 
 cursor.execute(query, (EMAIL,))
 
@@ -42,6 +45,14 @@ if (len(rows)) < 1:
 for stuff in rows:
 	print "User " + EMAIL + "\nID: " + str(stuff[0])
 	ID = stuff[0]
+
+if args.checkrole:
+	stmt = "SELECT * FROM roles WHERE userId = %s"
+	cursor.execute(stmt, (ID, ))
+	rows = cursor.fetchall()
+	print "User: " + EMAIL + " roles:"
+	for row in rows:
+		print "ROLE: " + row[4]
 
 if args.addrole:
 	stmt = "INSERT INTO roles(userId, role) VALUES (%s, %s)"
